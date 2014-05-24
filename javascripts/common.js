@@ -32,4 +32,31 @@ $(doc).ready(function() {
 		var t = adFrame[i];
 		t.parentNode.removeChild(t);
 	}
+
+
+    
+
+    // add tag to username
+    var userMenu = getElementsStartsWithId('nik_');
+    for (var i = 0; i < userMenu.length; i++) {
+        var tagNode = document.createElement("li");
+        
+        var tag = document.createTextNode("태그");
+        tagNode.appendChild(tag);
+        // testing 태그 tag
+        tagNode.setAttribute("onclick", "alert(\"tag works\")")
+        userMenu[i].childNodes[0].appendChild(tagNode);
+    }
 });
+
+// get elements starting with 'id'
+function getElementsStartsWithId(id) {
+    var children = document.body.getElementsByTagName('*');
+    var elements = [], child;
+    for (var i = 0, length = children.length; i < length; i++) {
+        child = children[i];
+        if (child.id.substr(0, id.length) == id)
+            elements.push(child);
+    }
+    return elements;
+}
