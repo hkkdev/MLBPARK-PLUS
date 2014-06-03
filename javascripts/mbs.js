@@ -123,6 +123,31 @@ function createBlindButton(keyword, target){
 	target.insertAdjacentElement('beforeBegin', button);
 }
 
+// get elements starting with 'id'
+function getElementsStartsWithId(id) {
+    var children = document.body.getElementsByTagName('*');
+    var elements = [], child;
+    for (var i = 0, length = children.length; i < length; i++) {
+        child = children[i];
+        if (child.id.substr(0, id.length) == id)
+            elements.push(child);
+    }
+    return elements;
+}
+
+// get usernames on page
+function getUsernames() {
+    var users = [];
+    var userSibling = getElementsStartsWithId('nik_');
+    for (i = 0; i < userSibling.length; i++) {
+        userHTML = userSibling[i].parentNode.getElementsByTagName('a')[0];
+        users.push(userHTML.innerHTML);
+    }
+    return users;
+}
+
+
+
 chrome.extension.sendMessage({action:'mbs'}, function(response) {
 	var opt = response;
 	var opt_titleIcon = opt.titleIcon,
@@ -142,8 +167,12 @@ chrome.extension.sendMessage({action:'mbs'}, function(response) {
 	opt_noticeBlock = opt.noticeBlock,
 	opt_shortcut = opt.shortcut,
 	opt_imageSearch = opt.imageSearch;
+    
+
 
 	doc.addEventListener('DOMContentLoaded', function(){
+        // add 태그 to user menu
+        addTagToMenu();
 		if (path !== '/mbs/commentV.php') {
 			var container = doc.getElementById('container');
 			var listLink = container.getElementsByClassName('G12read');
@@ -768,6 +797,7 @@ chrome.extension.sendMessage({action:'mbs'}, function(response) {
 		// Add a 'User Block' to User Menu
 		if (opt_userBlock == '1') {
 			function addUserBlock(scop){
+                // selecting id starting with 'nik_'
 				var userMenu = scop.querySelectorAll('div[id^=nik_]');
 				for (var i = 0, userMenuLen = userMenu.length; i < userMenuLen; i++) {
 					var t = userMenu[i];
@@ -787,8 +817,43 @@ chrome.extension.sendMessage({action:'mbs'}, function(response) {
 			}
 			addUserBlock(doc);
 		}
+
 	}, false);
 });
+
+// add tag to username
+function addTagToMenu() {
+    var userMenu = getElementsStartsWithId('nik');
+    for (var i = 0; i < userMenu.length; i++) {
+        var tagNode = document.createElement("li");
+        tagNode.setAttribute("id", "opener");
+        var tag = document.createTextNode("태그");
+        tagNode.appendChild(tag);
+
+        // testing 태그 tag
+        userMenu[i].getElementsByTagName('ul')[0].appendChild(tagNode);
+    }
+}
+
+// global user tags
+userTags = {};
+
+function tagClickHandler(e) {
+    e = e || window.event;
+    var target = e.target || e.srcElement;
+    if (!target.id.match(/opener/)) {
+        return e;
+    }
+    var tag = prompt("tag here");
+    // implement recursive func that checks for not null parent
+    var user = target.parentNode.parentNode.parentNode.getElementsByTagName("a")[0].innerText;
+    console.log(tag, user);
+
+    
+}
+
+win.addEventListener('click', tagClickHandler, false);
+
 
 win.addEventListener('message', function(event) {
 	// We only accept messages from ourselves
@@ -811,3 +876,4 @@ win.addEventListener('message', function(event) {
 		break;
 	}
 }, false);
+
