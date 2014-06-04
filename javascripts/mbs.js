@@ -1,3 +1,5 @@
+// contains tags for users
+var userTags = {};
 var doc = document;
 var win = window;
 var loc = win.location;
@@ -172,6 +174,7 @@ chrome.extension.sendMessage({action:'mbs'}, function(response) {
 
 	doc.addEventListener('DOMContentLoaded', function(){
         // add 태그 to user menu
+        userTags = getUserTags();
         addTagToMenu();
 		if (path !== '/mbs/commentV.php') {
 			var container = doc.getElementById('container');
@@ -824,6 +827,8 @@ chrome.extension.sendMessage({action:'mbs'}, function(response) {
 // add tag to username
 function addTagToMenu() {
     var userMenu = getElementsStartsWithId('nik');
+
+    // add tag to menu
     for (var i = 0; i < userMenu.length; i++) {
         var tagNode = document.createElement("li");
         tagNode.setAttribute("id", "opener");
@@ -832,11 +837,35 @@ function addTagToMenu() {
 
         // testing 태그 tag
         userMenu[i].getElementsByTagName('ul')[0].appendChild(tagNode);
+
+        // add tag to username
+        var username = userMenu[i].parentNode.childNodes[1].innerText;
+        if (userTags.hasOwnProperty(username)) {
+            var userTagNode = document.createElement("span");
+            userTagNode.setAttribute("id", "usertag");
+            var userTag = document.createTextNode(userTags[username]);
+            userTagNode.appendChild(userTag);
+            userMenu[i].parentNode.appendChild(userTagNode);
+
+        } else {
+            console.log(username, "not found");
+        }
+
     }
+
+    // add tag to username
 }
 
-// global user tags
-userTags = {};
+
+function getUserTags() {
+    var tagList = JSON.parse(window.localStorage.getItem("tags"));
+    return tagList;
+
+}
+
+function showUserTags() {
+    
+}
 
 function tagClickHandler(e) {
     e = e || window.event;
@@ -847,7 +876,10 @@ function tagClickHandler(e) {
     var tag = prompt("tag here");
     // implement recursive func that checks for not null parent
     var user = target.parentNode.parentNode.parentNode.getElementsByTagName("a")[0].innerText;
-    console.log(tag, user);
+
+    userTags[user] = tag;
+    console.log(userTags);
+    window.localStorage.setItem("tags", JSON.stringify(userTags));
 
     
 }
