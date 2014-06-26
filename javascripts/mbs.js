@@ -842,9 +842,9 @@ function addTagToMenu() {
         userMenu[i].getElementsByTagName('ul')[0].appendChild(tagNode);
 
         // add tag to username
-        var username = userMenu[i].parentNode.childNodes[1].innerText;
+        var username = userMenu[i].parentNode.getElementsByTagName('a')[0].innerText;
         if (userTags.hasOwnProperty(username)) {
-            console.log("username exists in tag");
+            console.log("--------------sername exists in tag");
 
             addTagValue(userMenu[i], username);
 
@@ -857,23 +857,42 @@ function addTagToMenu() {
 // add tag value to username
 function addTagValue(node, username){
 
-    var tNode = node.parentNode.lastChild;
-    if (tNode.getAttribute('id') == "usertag"){
-        // remove element if tag empty
-        if (!userTags[username]){
-            var rNode = node.parentNode.lastChild;
-            node.parentNode.removeChild(rNode);
-        // update tag value
-        } else {
-            tNode.innerText = " : " + userTags[username];
-        }
-    } else {
+    var nikNodes = getElementsStartsWithId('nik');
+    var allNodes = [],
+        len,
+        tNode;
 
-        var userTagNode = document.createElement("span");
-        userTagNode.setAttribute("id", "usertag");
-        var userTag = document.createTextNode(" : " + userTags[username]);
-        userTagNode.appendChild(userTag);
-        node.parentNode.appendChild(userTagNode);
+
+    for (var i = 0, len = nikNodes.length; i < len; i++) {
+       if (nikNodes[i].nextSibling.innerText == username) {
+           allNodes.push(nikNodes[i]);
+       }
+    }
+    console.log(allNodes);
+
+    for (var i = 0, len = allNodes.length; i < len; i++) {
+
+    
+        // element that contains tag value
+        tNode = allNodes[i].parentNode.lastChild;
+
+        if (tNode.getAttribute('id') == "usertag"){
+            // remove element if tag empty
+            if (!userTags[username]){
+                var rNode = allNodes[i].parentNode.lastChild;
+                allNodes[i].parentNode.removeChild(rNode);
+            // update tag value
+            } else {
+                tNode.innerText = " : " + userTags[username];
+            }
+        } else {
+
+            var userTagNode = document.createElement("span");
+            userTagNode.setAttribute("id", "usertag");
+            var userTag = document.createTextNode(" : " + userTags[username]);
+            userTagNode.appendChild(userTag);
+            allNodes[i].parentNode.appendChild(userTagNode);
+        }
     }
 }
 
