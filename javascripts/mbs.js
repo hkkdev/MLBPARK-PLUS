@@ -825,6 +825,7 @@ chrome.extension.sendMessage({action:'mbs'}, function(response) {
 });
 
 // add tag to username
+// runs when page loads
 function addTagToMenu() {
     var userMenu = getElementsStartsWithId('nik');
 
@@ -835,25 +836,45 @@ function addTagToMenu() {
         var tag = document.createTextNode("태그");
         tagNode.appendChild(tag);
 
-        // testing 태그 tag
+        // eventhandler for tags
+        tagNode.addEventListener('click', tagClickHandler, false);
+
         userMenu[i].getElementsByTagName('ul')[0].appendChild(tagNode);
 
         // add tag to username
         var username = userMenu[i].parentNode.childNodes[1].innerText;
         if (userTags.hasOwnProperty(username)) {
-            var userTagNode = document.createElement("span");
-            userTagNode.setAttribute("id", "usertag");
-            var userTag = document.createTextNode(userTags[username]);
-            userTagNode.appendChild(userTag);
-            userMenu[i].parentNode.appendChild(userTagNode);
+            console.log("username exists in tag");
+
+            addTagValue(userMenu[i], username);
 
         } else {
             console.log(username, "not found");
         }
-
     }
+}
 
-    // add tag to username
+// add tag value to username
+function addTagValue(node, username){
+
+    var tNode = node.parentNode.lastChild;
+    if (tNode.getAttribute('id') == "usertag"){
+        // remove element if tag empty
+        if (!userTags[username]){
+            var rNode = node.parentNode.lastChild;
+            node.parentNode.removeChild(rNode);
+        // update tag value
+        } else {
+            tNode.innerText = " : " + userTags[username];
+        }
+    } else {
+
+        var userTagNode = document.createElement("span");
+        userTagNode.setAttribute("id", "usertag");
+        var userTag = document.createTextNode(" : " + userTags[username]);
+        userTagNode.appendChild(userTag);
+        node.parentNode.appendChild(userTagNode);
+    }
 }
 
 
@@ -868,23 +889,30 @@ function showUserTags() {
 }
 
 function tagClickHandler(e) {
+    console.log("tagclickhandler");
     e = e || window.event;
     var target = e.target || e.srcElement;
     if (!target.id.match(/opener/)) {
         return e;
     }
     var tag = prompt("tag here");
-    // implement recursive func that checks for not null parent
     var user = target.parentNode.parentNode.parentNode.getElementsByTagName("a")[0].innerText;
 
-    userTags[user] = tag;
-    console.log(userTags);
-    window.localStorage.setItem("tags", JSON.stringify(userTags));
+    if (tag == "") {
+        delete userTags[user];
+        window.localStorage.setItem("tags", JSON.stringify(userTags));
+    } else {
+        userTags[user] = tag;
+        console.log(userTags);
+        window.localStorage.setItem("tags", JSON.stringify(userTags));
+    }
+    var node = target.parentNode.parentNode;
+    addTagValue(node, user);
+    
 
     
 }
 
-win.addEventListener('click', tagClickHandler, false);
 
 
 win.addEventListener('message', function(event) {
