@@ -1,5 +1,5 @@
 // contains tags for users
-var userTags = {};
+var userTags;
 var doc = document;
 var win = window;
 var loc = win.location;
@@ -903,9 +903,16 @@ function addTagValue(node, username){
 
 
 function getUserTags() {
-    var tagList = JSON.parse(window.localStorage.getItem("tags"));
-    return tagList;
-
+    // initialize localStorage for tags
+    if (!window.localStorage.getItem("tags")){
+        var blank = {};
+        window.localStorage.setItem("tags", JSON.stringify(blank));
+        return blank;
+    }
+    else {
+        var taglist = JSON.parse(window.localStorage.getItem("tags"));
+        return taglist;
+    }
 }
 
 function showUserTags() {
