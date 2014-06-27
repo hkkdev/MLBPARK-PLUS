@@ -168,14 +168,18 @@ chrome.extension.sendMessage({action:'mbs'}, function(response) {
 	opt_videoResize = opt.videoResize,
 	opt_noticeBlock = opt.noticeBlock,
 	opt_shortcut = opt.shortcut,
+    opt_tagUser = opt.tagUser,
 	opt_imageSearch = opt.imageSearch;
+    
     
 
 
 	doc.addEventListener('DOMContentLoaded', function(){
         // add 태그 to user menu
-        userTags = getUserTags();
-        addTagToMenu();
+        if (opt_tagUser == 1) {
+            userTags = getUserTags();
+            addTagToMenu();
+        }
 		if (path !== '/mbs/commentV.php') {
 			var container = doc.getElementById('container');
 			var listLink = container.getElementsByClassName('G12read');
@@ -883,13 +887,14 @@ function addTagValue(node, username){
                 allNodes[i].parentNode.removeChild(rNode);
             // update tag value
             } else {
-                tNode.innerText = " : " + userTags[username];
+                tNode.innerText = " " + userTags[username];
             }
         } else {
 
             var userTagNode = document.createElement("span");
             userTagNode.setAttribute("id", "usertag");
-            var userTag = document.createTextNode(" : " + userTags[username]);
+            userTagNode.style.color = 'red';
+            var userTag = document.createTextNode(" " + userTags[username]);
             userTagNode.appendChild(userTag);
             allNodes[i].parentNode.appendChild(userTagNode);
         }

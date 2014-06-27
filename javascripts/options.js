@@ -22,7 +22,8 @@ var optionName = [
 	'width',
 	'widthVal',
 	'slideCurrent',
-	'range'
+	'range',
+    'addTag'
 ];
 
 for (var k = 0; k < optionName.length; k++){
@@ -52,6 +53,7 @@ function reset(){
 	widthVal.value = '858';
 	slideCurrent.innerText = '858';
 	range.classList.add('hide');
+    addTag.checked = false;
 }
 
 (function restore(){
@@ -172,6 +174,15 @@ function reset(){
 	if (localStorage['widthVal']) {
 		widthVal.value = localStorage['widthVal'];
 	}
+
+    // set tag option based on saved pref
+    if (!localStorage['addtag']) {
+        addTag.checked = false;
+    } else if (localStorage['addtag'] == 1) {
+        addTag.checked = true;
+    } else if (localStorage['addtag'] == 0) {
+        addTag.checked = false;
+    }
 }());
 
 function save(){
@@ -241,6 +252,9 @@ function save(){
 
 	if (width.checked == true) {localStorage['width'] = 1;}
 	else {localStorage['width'] = 0;}
+
+    if (addTag.checked == true) {localStorage['addtag'] = 1;}
+    else {localStorage['addtag'] = 0;}
 
 	localStorage['widthVal'] = widthVal.value;
 

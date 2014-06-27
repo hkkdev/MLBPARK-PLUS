@@ -141,6 +141,7 @@ function storeDefaultOptionValueIfNotExists() {
 	if(null == localStorage['shortcut']) localStorage['shortcut'] = 1;
 	if(null == localStorage['width']) localStorage['width'] = 0;
 	if(null == localStorage['widthVal']) localStorage['widthVal'] = 858;
+    if(null == localStorage['addTag']) localStorage['addTag'] = 0;
 }
 
 function blockKeywordTrim(storage, storageVar) {
@@ -169,7 +170,8 @@ function onMessage(request, sender, sendResponse) {
 				videoResize: localStorage['video'],
 				noticeBlock: localStorage['notice'],
 				shortcut: localStorage['shortcut'],
-				imageSearch: localStorage['imageSearch']
+				imageSearch: localStorage['imageSearch'],
+                tagUser: localStorage['addtag']
 			});
 		break;
 		case 'main':
