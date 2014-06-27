@@ -148,8 +148,6 @@ function getUsernames() {
     return users;
 }
 
-
-
 chrome.extension.sendMessage({action:'mbs'}, function(response) {
 	var opt = response;
 	var opt_titleIcon = opt.titleIcon,
@@ -175,11 +173,6 @@ chrome.extension.sendMessage({action:'mbs'}, function(response) {
 
 
 	doc.addEventListener('DOMContentLoaded', function(){
-        // add 태그 to user menu
-        if (opt_tagUser == 1) {
-            userTags = getUserTags();
-            addTagToMenu();
-        }
 		if (path !== '/mbs/commentV.php') {
 			var container = doc.getElementById('container');
 			var listLink = container.getElementsByClassName('G12read');
@@ -825,6 +818,10 @@ chrome.extension.sendMessage({action:'mbs'}, function(response) {
 			addUserBlock(doc);
 		}
 
+        if (opt_tagUser == 1) {
+            userTags = getUserTags();
+            addTagToMenu();
+        }
 	}, false);
 });
 
@@ -839,21 +836,12 @@ function addTagToMenu() {
         tagNode.setAttribute("id", "opener");
         var tag = document.createTextNode("태그");
         tagNode.appendChild(tag);
-
-        // eventhandler for tags
         tagNode.addEventListener('click', tagClickHandler, false);
-
         userMenu[i].getElementsByTagName('ul')[0].appendChild(tagNode);
-
         // add tag to username
         var username = userMenu[i].parentNode.getElementsByTagName('a')[0].innerText;
         if (userTags.hasOwnProperty(username)) {
-            console.log("--------------sername exists in tag");
-
             addTagValue(userMenu[i], username);
-
-        } else {
-            console.log(username, "not found");
         }
     }
 }
@@ -866,17 +854,14 @@ function addTagValue(node, username){
         len,
         tNode;
 
-
+    // find all node with same nickname
     for (var i = 0, len = nikNodes.length; i < len; i++) {
        if (nikNodes[i].nextSibling.innerText == username) {
            allNodes.push(nikNodes[i]);
        }
     }
-    console.log(allNodes);
 
     for (var i = 0, len = allNodes.length; i < len; i++) {
-
-    
         // element that contains tag value
         tNode = allNodes[i].parentNode.lastChild;
 
@@ -890,8 +875,7 @@ function addTagValue(node, username){
                 tNode.innerText = " " + userTags[username];
             }
         } else {
-
-            var userTagNode = document.createElement("span");
+            var userTagNode = document.createElement("p");
             userTagNode.setAttribute("id", "usertag");
             userTagNode.style.color = 'red';
             var userTag = document.createTextNode(" " + userTags[username]);
@@ -915,36 +899,30 @@ function getUserTags() {
     }
 }
 
-function showUserTags() {
-    
-}
-
+// event handler for tag
 function tagClickHandler(e) {
-    console.log("tagclickhandler");
     e = e || window.event;
     var target = e.target || e.srcElement;
     if (!target.id.match(/opener/)) {
         return e;
     }
-    var tag = prompt("tag here");
     var user = target.parentNode.parentNode.parentNode.getElementsByTagName("a")[0].innerText;
-
+    var tagVal = userTags[user];
+    // set tagVal to blank if not found
+    if (!tagVal) {
+        tagVal = "";
+    }
+    var tag = prompt("닉내임 태그", tagVal);
     if (tag == "") {
         delete userTags[user];
         window.localStorage.setItem("tags", JSON.stringify(userTags));
     } else {
         userTags[user] = tag;
-        console.log(userTags);
         window.localStorage.setItem("tags", JSON.stringify(userTags));
     }
     var node = target.parentNode.parentNode;
     addTagValue(node, user);
-    
-
-    
 }
-
-
 
 win.addEventListener('message', function(event) {
 	// We only accept messages from ourselves
