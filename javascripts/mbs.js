@@ -167,6 +167,7 @@ chrome.extension.sendMessage({action:'mbs'}, function(response) {
 	opt_noticeBlock = opt.noticeBlock,
 	opt_shortcut = opt.shortcut,
     opt_tagUser = opt.tagUser,
+    opt_tagValues = opt.tagValues,
 	opt_imageSearch = opt.imageSearch;
     
     
@@ -818,8 +819,9 @@ chrome.extension.sendMessage({action:'mbs'}, function(response) {
 			addUserBlock(doc);
 		}
 
+        // add tags
         if (opt_tagUser == 1) {
-            userTags = getUserTags();
+            userTags = getUserTags(opt_tagValues);
             addTagToMenu();
         }
 	}, false);
@@ -878,7 +880,11 @@ function addTagValue(node, username){
             var userTagNode = document.createElement("p");
             userTagNode.setAttribute("id", "usertag");
             userTagNode.style.color = 'red';
-            var userTag = document.createTextNode(" " + userTags[username]);
+            var val = userTags[username];
+            if (!val) {
+                val = "";
+            }
+            var userTag = document.createTextNode(val);
             userTagNode.appendChild(userTag);
             allNodes[i].parentNode.appendChild(userTagNode);
         }
@@ -886,17 +892,9 @@ function addTagValue(node, username){
 }
 
 
-function getUserTags() {
-    // initialize localStorage for tags
-    if (!window.localStorage.getItem("tags")){
-        var blank = {};
-        window.localStorage.setItem("tags", JSON.stringify(blank));
-        return blank;
-    }
-    else {
-        var taglist = JSON.parse(window.localStorage.getItem("tags"));
-        return taglist;
-    }
+function getUserTags(tagValues) {
+    var tagVal = JSON.parse(tagValues);
+    return tagVal;
 }
 
 // event handler for tag
@@ -915,11 +913,17 @@ function tagClickHandler(e) {
     var tag = prompt("닉내임 태그", tagVal);
     if (tag == "") {
         delete userTags[user];
-        window.localStorage.setItem("tags", JSON.stringify(userTags));
     } else {
         userTags[user] = tag;
-        window.localStorage.setItem("tags", JSON.stringify(userTags));
     }
+    var tVal = JSON.stringify(userTags);
+    chrome.runtime.sendMessage({
+        action: 'tag',
+        tagVal: tVal
+    },
+    function(response) {
+    
+    });
     var node = target.parentNode.parentNode;
     addTagValue(node, user);
 }

@@ -142,6 +142,10 @@ function storeDefaultOptionValueIfNotExists() {
 	if(null == localStorage['width']) localStorage['width'] = 0;
 	if(null == localStorage['widthVal']) localStorage['widthVal'] = 858;
     if(null == localStorage['addTag']) localStorage['addTag'] = 0;
+    if(null == localStorage['tags']) {
+        var a = {};
+        localStorage['tags'] = JSON.stringify(a);
+    }
 }
 
 function blockKeywordTrim(storage, storageVar) {
@@ -171,7 +175,8 @@ function onMessage(request, sender, sendResponse) {
 				noticeBlock: localStorage['notice'],
 				shortcut: localStorage['shortcut'],
 				imageSearch: localStorage['imageSearch'],
-                tagUser: localStorage['addtag']
+                tagUser: localStorage['addtag'],
+                tagValues: localStorage['tags']
 			});
 		break;
 		case 'main':
@@ -198,6 +203,10 @@ function onMessage(request, sender, sendResponse) {
 		case 'userBlockDelivery':
 			sendResponse(blockUserFn(request, sender));
 		break;
+        case 'tag':
+            localStorage['tags'] = request.tagVal;
+            sendResponse({status: 'ok'});
+        break;
 	}
 }
 storeDefaultOptionValueIfNotExists();
