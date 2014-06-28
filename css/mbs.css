@@ -215,3 +215,16 @@ rgba(0,0,0,.15),0 0 0 1px rgba(0,0,0,.2);}
 
 /* Uchat fix */
 div[id^="uchat_"] {display:block !important;}
+
+#usertag #popup {
+    display: none;
+}
+#usertag:hover #popup {
+    padding: 5px;
+    border: 1px solid #000;
+    position: absolute;
+    background-color: #FFF;
+    display: block;
+    border-radius: 3px;
+    z-index: 1;
+}

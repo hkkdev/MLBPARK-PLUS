@@ -849,12 +849,13 @@ function addTagToMenu() {
 }
 
 // add tag value to username
-function addTagValue(node, username){
+function addTagValue(node, username, e){
 
     var nikNodes = getElementsStartsWithId('nik');
     var allNodes = [],
         len,
-        tNode;
+        tNode,
+        shortVal;
 
     // find all node with same nickname
     for (var i = 0, len = nikNodes.length; i < len; i++) {
@@ -866,6 +867,16 @@ function addTagValue(node, username){
     for (var i = 0, len = allNodes.length; i < len; i++) {
         // element that contains tag value
         tNode = allNodes[i].parentNode.lastChild;
+        
+        var val = userTags[username];
+        if (!val) {
+            shortVal = "";
+            val = "";
+        } else if (val.length > 6) {
+            shortVal = val.substring(0, 6) + "...";
+        } else {
+            shortVal = val;
+        }
 
         if (tNode.getAttribute('id') == "usertag"){
             // remove element if tag empty
@@ -874,23 +885,18 @@ function addTagValue(node, username){
                 allNodes[i].parentNode.removeChild(rNode);
             // update tag value
             } else {
-                tNode.innerText = " " + userTags[username];
+                tNode.innerHTML = shortVal + "<div id='popup'>" + val + "</div>";
             }
         } else {
             var userTagNode = document.createElement("p");
+            var tagPopup = document.createElement("div");
             userTagNode.setAttribute("id", "usertag");
             userTagNode.style.color = 'red';
-            var val = userTags[username];
-            if (!val) {
-                val = "";
-            }
-            var userTag = document.createTextNode(val);
-            userTagNode.appendChild(userTag);
+            userTagNode.innerHTML = shortVal + "<div id='popup'>" + val + "</div>";
             allNodes[i].parentNode.appendChild(userTagNode);
         }
     }
 }
-
 
 function getUserTags(tagValues) {
     var tagVal = JSON.parse(tagValues);
@@ -911,21 +917,26 @@ function tagClickHandler(e) {
         tagVal = "";
     }
     var tag = prompt("닉내임 태그", tagVal);
-    if (tag == "") {
+    if (tag == null) {
+        return;
+    }
+    else if (tag == "") {
         delete userTags[user];
     } else {
         userTags[user] = tag;
     }
     var tVal = JSON.stringify(userTags);
+
+    // send tagValues to extension
     chrome.runtime.sendMessage({
         action: 'tag',
         tagVal: tVal
     },
     function(response) {
-    
+        // optional    
     });
     var node = target.parentNode.parentNode;
-    addTagValue(node, user);
+    addTagValue(node, user, e);
 }
 
 win.addEventListener('message', function(event) {
